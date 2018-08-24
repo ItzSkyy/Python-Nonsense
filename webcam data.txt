@@ -1,0 +1,180 @@
+This Raspberry Pi webcam server tutorial will take you through on how to have your very own Webcam that is visible on a webpage.
+
+If you’re after more of a security like system, then check out the Raspberry Pi security camera tutorial as it features fully-fledged web streaming, motion detection, recording and multi-camera functionality.
+
+This tutorial is marked “intermediate” as it can be challenging to get working especially if you have hardware that differs to the versions used in this tutorial. If you find that you can’t get this to work, then the security camera solution linked above is much easier to get going.
+
+Ultimate Books of Pi
+If you’re more of a visual person and would prefer to watch how to set this up, then you check out my video below. If you like the video, then please subscribe to me, so you’re kept up to date with all the latest videos. Unfortunately, the video is now out of date and uses an older method then what’s explained in the text version of this tutorial.
+
+
+
+ Equipment
+Below are some of the pieces of equipment that you will need to be able to complete this tutorial.
+
+Recommended:
+ Raspberry Pi
+
+ Micro SD Card or SD Card (If you’re using an old version of the Pi)
+
+ Ethernet Cord or Wifi dongle
+
+ Raspberry Pi Camera or USB Webcam
+
+Optional:
+ USB Keyboard
+
+ USB Mouse
+
+HDMI Cable
+
+ How to Setup a Raspberry Pi Webcam Server
+Firstly, we will need to install Raspbian onto the Raspberry Pi. If you haven’t already done, this then check out my awesome guide on installing NOOBs Raspberry Pi. It will take you through all the steps that you will need to do to get up and running.
+
+In this tutorial, we will be using a package called Motion if you want to learn more about it you can check out their website at Motion.
+
+
+ 
+Since the latest version of Raspbian is missing dependencies that Motion requires for it to work correctly, we will need to install a different precompiled version. The package maintainer (Calin Crisan) of Motioneye provides a package that has everything we need, and it works just fine with the Raspberry Pi.
+
+1. We will be using the terminal, so open the terminal on the Pi or connect to it via SSH.
+
+2. To begin, first, update the Raspberry Pi, so you’re running on the latest version.
+
+sudo apt-get update
+sudo apt-get upgrade
+Depending on the version of Raspbian you’re using you will need to do a few different steps.
+
+Raspbian Jessie
+1. We start by removing libraries that may conflict with the newer packages. These may or may not already exist on your copy of Raspbian.
+
+sudo apt-get remove libavcodec-extra-56 libavformat56 libavresample2 libavutil54
+2. Download and install the following packages by inserting the following commands into the terminal.
+
+wget https://github.com/ccrisan/motioneye/wiki/precompiled/ffmpeg_3.1.1-1_armhf.deb
+sudo dpkg -i ffmpeg_3.1.1-1_armhf.deb
+3. Now we need to install the following packages. We will need these as the Motion software relies on them.
+
+sudo apt-get install curl libssl-dev libcurl4-openssl-dev libjpeg-dev libx264-142 libavcodec56 libavformat56 libmysqlclient18 libswscale3 libpq5
+4. With those packages installed we can now grab the latest version of the motion software and install it. To do this run the following commands.
+
+wget https://github.com/Motion-Project/motion/releases/download/release-4.0.1/pi_jessie_motion_4.0.1-1_armhf.deb
+sudo dpkg -i pi_jessie_motion_4.0.1-1_armhf.deb
+Raspbian Stretch
+1. First, install the following packages. This command will work both on the full and lite version of Raspbian Stretch.
+
+sudo apt-get install libmariadbclient18 libpq5 libavcodec57  libavformat57 libavutil55 libswscale4
+2.Next, download the Motion deb file from the GitHub and install it using the dpkg command.
+
+sudo wget https://github.com/Motion-Project/motion/releases/download/release-4.0.1/pi_stretch_motion_4.0.1-1_armhf.deb
+sudo dpkg -i pi_stretch_motion_4.0.1-1_armhf.deb
+That’s all you need to do before moving on to configuring Motion so that it will run on your Pi.
+
+Configuring Motion
+1. Now we need to make some edits to the configuration file (motion.conf)
+
+sudo nano /etc/motion/motion.conf
+2. Find the following lines and change them to the following.
+
+daemon on
+stream_localhost off
+Note: Change the following two lines from on to off if you’re having issues with the stream freezing whenever motion occurs.
+
+output_pictures off
+ffmpeg_output_movies off
+Optional (Don’t include the text in brackets)
+
+stream_maxrate 100 (This will allow for real-time streaming but requires more bandwidth & resources)
+framerate 100 (This will allow for 100 frames to be captured per second allowing for smoother video)
+width 640 (This changes the width of the image displayed)
+height 480 (This changes the height of the image displayed)
+3. Now we need to setup up the daemon. First, we need to edit the motion file.
+
+sudo nano /etc/default/motion
+4. Find the following line and change it to the following:
+
+start_motion_daemon=yes
+5. Once you’re done, simply save and exit by pressing ctrl+x then y.
+
+6. Now make sure the camera is connected and run the following line:
+
+sudo service motion start
+7. If you need to stop the service, simply run the following command:
+
+sudo service motion stop
+8. Now you should be able to check out the Webcam Stream at the IP address of our Pi so in your browser go to the following address:
+
+192.168.1.103:8081
+9. If the webpage isn’t loading, try restarting the service.
+
+sudo service motion restart
+10. If you’re using a Raspberry Pi camera, then you will need to do a few extra steps that are mentioned below.
+
+
+ 
+There we have it a fully working Raspberry Pi Webcam server that you can place wherever you would like (Given it is within Wifi range) and be able to view the stream via the web browser. If you want to allow external access to it, then check out my instructions towards the bottom of this tutorial.
+
+raspberry pi USB webcam in action
+ Extra Steps for the Raspberry Pi Camera
+If you want to use the Raspberry Pi camera module, then you will need to do a few additional steps to set it up.
+
+ Installing the Hardware
+1. First, go to the CSI ribbon cable slot on the Pi and with two fingers on each side of the connector pull up. This technique should now open the connector, now insert the ribbon cable with the metal leads facing away from the Ethernet Port.
+
+2. Once you have lined it up gently press the connector back down and the cable should now be locked in one place.
+
+
+ 
+Clips and Ribbon Cable
+ Configuring the Software
+To get the Raspberry Pi camera to work with Motion, we will need to do a few extra steps.
+
+1. First make sure the camera is switched on within raspi config, enter the following command and then enable the camera. (You will need to restart once you have done this).
+
+sudo raspi-config
+2. Now open up the modules file by entering the following line.
+
+sudo nano /etc/modules
+3. Enter the following line at the bottom of the file if it doesn’t already exist, once done save & exit by pressing ctrl+x then y.
+
+bcm2835-v4l2
+4. Now reboot the Pi, and the stream should now work.
+
+sudo reboot
+5. You should now be able to access the Raspberry Pi webcam stream by going to the Pi’s IP address on port 8081.
+
+192.168.1.103:8081
+You should now have a fully working Raspberry Pi camera server that is accessible within your local network. If you want to allow external access to the camera, then please follow my instructions below.
+
+Webcam Server Browser
+ Setting up outside External Access
+In order to enable external access to the Raspberry Pi webcam server, we will need to change some settings on the router. However, all routers are designed differently so you may need to look up instructions for your brand of router. Please note, opening ports to the internet comes with a security risk.
+
+If you need a more in-depth guide, then be sure to take a look at my guide on how to set up Raspberry Pi port forwarding and dynamic DNS.
+
+
+ 
+The following steps are what I did on mine in order to get it to work. My router is an AC1750 TP-Link Router.
+1. Go to the Router admin page (This will typically be 192.168.1.1 or 192.168.254)
+
+2. Enter the username and password. Default typically is admin & admin.
+
+3. Once in go to forwarding->Virtual Server and then click on add new.
+
+4. In here enter:
+
+Service port: In this case 48461
+IP Address: 192.168.1.103 (Address of your Pi)
+Internal Port: We want this to be the same as the webcam server so make it 8081
+Protocol: All
+Status: Enabled
+5. These settings will route all traffic destined for port 48461 to the webcam server located at the IP address and port you provided. (192.168.1.103:8081)
+
+6. You should now be able to connect to the Raspberry Pi webcam stream outside your network. You may need to restart the router for changes to take effect.
+Router Port Forwarding
+If you’re unable to connect outside your local network then you can try the following:
+
+Check your router settings and confirm they are correct.
+Check your IP hasn’t changed (Some IPs will provide you with a dynamic IP rather than a static IP) You can set up something called dynamic DNS to counter this you can find out more information via the link mentioned above.
+Restart the router.
+I hope that you have enjoyed this tutorial on how to build a Raspberry Pi webcam server if you want more then, please check out all my Raspberry Pi projects I currently have completed! There will be much more coming in the future.
