@@ -2,4 +2,11 @@
 <p>Your browser does not support iframes.</p>
 </iframe>"
 
-Change this to the IP address of your Internet connection. You can also test with the IP address of the camera that was assigned in step 8 above, but this IP address will only work on the local network where the camera is located. 
+Change this to the IP address of your Internet connection. You can also test with the IP address of the
+camera that was assigned in step 8 above, but this IP address will only work on the local network where
+the camera is located. 
+
+
+-------
+
+
